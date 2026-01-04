@@ -1,47 +1,79 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  // Elements
+  const fiveYEl = document.getElementById("fiveYBreakeven");
+  const el2Y = document.getElementById("ca2y");
+  const el10Y = document.getElementById("ca10y");
+  const el10YReal = document.getElementById("ca10yreal");
+  const spreadEl = document.getElementById("spread");
+
+  // State for spread calculation
+  let canada2Y = null;
+  let canada10Y = null;
+
   try {
     const res = await fetch("https://bondsignal.onrender.com/api/yields");
     const data = await res.json();
 
-    // 5Y US breakeven
-    const fiveYEl = document.getElementById("fiveYBreakeven");
-    if (fiveYEl && data.fiveYBreakeven?.value != null) {
-      fiveYEl.textContent = `5Y Breakeven: ${data.fiveYBreakeven.value.toFixed(2)}% (as of ${data.fiveYBreakeven.date})`;
+    // ------------------------------
+    // 5Y US Breakeven
+    // ------------------------------
+    if (fiveYEl) {
+      if (data.fiveYBreakeven?.value != null) {
+        fiveYEl.textContent = `5Y Breakeven: ${data.fiveYBreakeven.value.toFixed(2)}% (as of ${data.fiveYBreakeven.date})`;
+      } else {
+        fiveYEl.textContent = "5Y Breakeven: Data unavailable";
+      }
     }
 
-    // Canada yields
-    const { canada2Y, canada10Y, canada10YReal, date: canadaDate } = data.canadaYields || {};
+    // ------------------------------
+    // Canada Yields
+    // ------------------------------
+    const canadaYields = data.canadaYields || {};
+    canada2Y = canadaYields.canada2Y ?? null;
+    canada10Y = canadaYields.canada10Y ?? null;
+    const canada10YReal = canadaYields.canada10YReal ?? null;
+    const canadaDate = canadaYields.date || "";
 
-    const el2Y = document.getElementById("ca2y");
-    if (el2Y && canada2Y != null) el2Y.textContent = `Canada 2Y: ${canada2Y.toFixed(2)}% (as of ${canadaDate})`;
+    if (el2Y) {
+      el2Y.textContent = canada2Y != null
+        ? `Canada 2Y: ${canada2Y.toFixed(2)}% (as of ${canadaDate})`
+        : "Canada 2Y: Data unavailable";
+    }
 
-    const el10Y = document.getElementById("ca10y");
-    if (el10Y && canada10Y != null) el10Y.textContent = `Canada 10Y: ${canada10Y.toFixed(2)}% (as of ${canadaDate})`;
+    if (el10Y) {
+      el10Y.textContent = canada10Y != null
+        ? `Canada 10Y: ${canada10Y.toFixed(2)}% (as of ${canadaDate})`
+        : "Canada 10Y: Data unavailable";
+    }
 
-    const el10YReal = document.getElementById("ca10yreal");
-    if (el10YReal && canada10YReal != null) el10YReal.textContent = `Canada 10Y Real: ${canada10YReal.toFixed(2)}% (as of ${canadaDate})`;
+    if (el10YReal) {
+      el10YReal.textContent = canada10YReal != null
+        ? `Canada 10Y Real: ${canada10YReal.toFixed(2)}% (as of ${canadaDate})`
+        : "Canada 10Y Real: Data unavailable";
+    }
 
-    const spreadEl = document.getElementById("spread");
-    if (spreadEl && canada10Y != null && canada2Y != null) {
-      const spread = (canada10Y - canada2Y).toFixed(2);
-      spreadEl.textContent = `10Y − 2Y Spread: ${spread}%`;
+    // ------------------------------
+    // Spread calculation (10Y - 2Y)
+    // ------------------------------
+    if (spreadEl) {
+      if (canada2Y != null && canada10Y != null) {
+        const spread = (canada10Y - canada2Y).toFixed(2);
+        spreadEl.textContent = `10Y − 2Y Spread: ${spread}%`;
+      } else if (canada2Y != null || canada10Y != null) {
+        spreadEl.textContent = "10Y − 2Y Spread: Partial data available";
+      } else {
+        spreadEl.textContent = "10Y − 2Y Spread: Data unavailable";
+      }
     }
 
   } catch (err) {
     console.error("Frontend error:", err);
 
-    // fallback if API fails
-    const fallbackEls = [
-      "fiveYBreakeven",
-      "ca2y",
-      "ca10y",
-      "ca10yreal",
-      "spread"
-    ];
-    fallbackEls.forEach(id => {
-      const el = document.getElementById(id);
+    // Fallback: show "Data unavailable" for all
+    [fiveYEl, el2Y, el10Y, el10YReal, spreadEl].forEach(el => {
       if (el) el.textContent = "Data unavailable";
     });
   }
 });
+
 
