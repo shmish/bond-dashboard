@@ -71,11 +71,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Canada CPI YoY
     // ------------------------------
     if (cpiEl) {
-      if (data.cpiYoY?.value != null) {
-        cpiEl.textContent = `Core CPI YoY: ${data.cpiYoY.value.toFixed(2)}% (as of ${data.cpiYoY.date})`;
-      } else {
-        cpiEl.textContent = "Core CPI YoY: Data unavailable";
-      }
+      const cpiTrim = canadaYields.cpiTrimYoY;
+      cpiEl.textContent = cpiTrim != null
+        ? `CPI-Trim YoY: ${cpiTrim.toFixed(2)}% (as of ${canadaYields.date})`
+        : "CPI-Trim YoY: Data unavailable";
     }
 
   } catch (err) {
