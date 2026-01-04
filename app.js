@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const el10Y = document.getElementById("ca10y");
   const el10YReal = document.getElementById("ca10yreal");
   const spreadEl = document.getElementById("spread");
+  const cpiEl = document.getElementById("cpi");
 
   // State for spread calculation
   let canada2Y = null;
@@ -66,11 +67,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
+    // ------------------------------
+    // Canada CPI YoY
+    // ------------------------------
+    if (cpiEl) {
+      if (data.cpiYoY?.value != null) {
+        cpiEl.textContent = `Core CPI YoY: ${data.cpiYoY.value.toFixed(2)}% (as of ${data.cpiYoY.date})`;
+      } else {
+        cpiEl.textContent = "Core CPI YoY: Data unavailable";
+      }
+    }
+
   } catch (err) {
     console.error("Frontend error:", err);
 
     // Fallback: show "Data unavailable" for all
-    [fiveYEl, el2Y, el10Y, el10YReal, spreadEl].forEach(el => {
+    [fiveYEl, el2Y, el10Y, el10YReal, spreadEl, cpiEl].forEach(el => {
       if (el) el.textContent = "Data unavailable";
     });
   }
