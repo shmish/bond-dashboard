@@ -95,6 +95,23 @@ document.addEventListener("DOMContentLoaded", async () => {
           : "Canada Unemployment: Data unavailable";
     }
 
+    // ------------------------------
+    // FRED PMI
+    // ------------------------------
+    const pmiEl = document.getElementById("canadaPmi");
+    if (pmiEl) {
+      const obj = data.canadaPmi || null;
+      const raw = obj ? obj.value : null;
+      const v = raw == null ? null : Number(raw);
+      const d = obj ? obj.date : null;
+      const id = obj ? obj.seriesId : null;
+
+      pmiEl.textContent =
+        Number.isFinite(v) && d
+          ? `Canada PMI: ${v.toFixed(1)} (as of ${d})${id ? ` [${id}]` : ""}`
+          : "Canada PMI: Data unavailable";
+    }
+
 
   } catch (err) {
     console.error("Frontend error:", err);
