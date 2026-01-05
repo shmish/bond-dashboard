@@ -29,15 +29,21 @@
 <body>
   <h1>Canada Bond Dashboard</h1>
 
-  <div class="yield-box" id="fiveYBreakeven">5Y Breakeven: loading...</div>
-  <div class="yield-box" id="ca2y">Canada 2Y: loading...</div>
-  <div class="yield-box" id="ca10y">Canada 10Y: loading...</div>
-  <div class="yield-box" id="ca10yreal">Canada 10Y Real: loading...</div>
-  <div class="yield-box" id="spread">10Y − 2Y Spread: loading...</div>
-  <div class="yield-box" id="cpi">Core CPI YoY: loading...</div>
-  <div class="yield-box" id="caUnemployment">Canada Unemployment: loading...</div>
-  <div class="yield-box" id="iveyPmiSA">Ivey PMI (SA): loading...</div>
-  <div class="yield-box" id="igCreditSpread">IG Credit Spread: loading...</div>
+  <table border="1" cellpadding="6">
+    <thead>
+      <tr>
+        <th>Indicator</th>
+        <th>Current</th>
+        <th>1 Month Ago</th>
+      </tr>
+    </thead>
+    <tbody id="dataBody">
+      <tr><td colspan="3">Loading…</td></tr>
+    </tbody>
+  </table>
+
+<script src="app.js?v=12"></script>
+
 
   <script src="app.js"></script>
 </body>

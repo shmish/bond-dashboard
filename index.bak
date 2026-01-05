@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Canada Bond Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+    }
+    .yield-box {
+      background: white;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .label {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Canada Bond Dashboard</h1>
+
+  <div class="yield-box" id="ca2y">Canada 2Y: loading...</div>
+  <div class="yield-box" id="ca10y">Canada 10Y: loading...</div>
+  <div class="yield-box" id="spread">10Y − 2Y Spread: loading...</div>
+  <div class="yield-box" id="ca10yreal">Canada 10Y Real: loading...</div>
+  <div class="yield-box" id="fiveYBreakeven">5Y Breakeven: loading...</div>
+  <div class="yield-box" id="cpi">Core CPI YoY: loading...</div>
+  <div class="yield-box" id="caUnemployment">Canada Unemployment: loading...</div>
+  <div class="yield-box" id="iveyPmiSA">Ivey PMI (SA): loading...</div>
+  <div class="yield-box" id="igCreditSpread">IG Credit Spread: loading...</div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+

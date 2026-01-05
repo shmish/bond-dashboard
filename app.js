@@ -1,149 +1,92 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  // Elements
-  const fiveYEl = document.getElementById("fiveYBreakeven");
-  const el2Y = document.getElementById("ca2y");
-  const el10Y = document.getElementById("ca10y");
-  const el10YReal = document.getElementById("ca10yreal");
-  const spreadEl = document.getElementById("spread");
-  const cpiEl = document.getElementById("cpi");
+  const tableBody = document.getElementById("dataBody");
 
-  // State for spread calculation
-  let canada2Y = null;
-  let canada10Y = null;
+  function fmt(v, digits = 2) {
+    return (v == null || !Number.isFinite(v)) ? "—" : v.toFixed(digits);
+  }
+
+  function row(label, cur, prev, unit = "%", digits = 2) {
+    const tr = document.createElement("tr");
+
+    const tdLabel = document.createElement("td");
+    tdLabel.textContent = label;
+
+    const tdCur = document.createElement("td");
+    tdCur.textContent = cur?.value != null
+      ? `${fmt(cur.value, digits)}${unit}`
+      : "—";
+
+    const tdPrev = document.createElement("td");
+    tdPrev.textContent = prev?.value != null
+      ? `${fmt(prev.value, digits)}${unit}`
+      : "—";
+
+    tr.append(tdLabel, tdCur, tdPrev);
+    return tr;
+  }
+
+  function spreadRow(label, curY, curX, prevY, prevX) {
+    const tr = document.createElement("tr");
+
+    const tdLabel = document.createElement("td");
+    tdLabel.textContent = label;
+
+    const cur =
+      curY?.value != null && curX?.value != null
+        ? (curY.value - curX.value)
+        : null;
+
+    const prev =
+      prevY?.value != null && prevX?.value != null
+        ? (prevY.value - prevX.value)
+        : null;
+
+    const tdCur = document.createElement("td");
+    tdCur.textContent = cur != null ? `${cur.toFixed(2)}%` : "—";
+
+    const tdPrev = document.createElement("td");
+    tdPrev.textContent = prev != null ? `${prev.toFixed(2)}%` : "—";
+
+    tr.append(tdLabel, tdCur, tdPrev);
+    return tr;
+  }
 
   try {
     const res = await fetch("https://bondsignal.onrender.com/api/yields");
     const data = await res.json();
 
-    // ------------------------------
-    // 5Y US Breakeven
-    // ------------------------------
-    if (fiveYEl) {
-      if (data.fiveYBreakeven?.value != null) {
-        fiveYEl.textContent = `5Y Breakeven: ${data.fiveYBreakeven.value.toFixed(2)}% (as of ${data.fiveYBreakeven.date})`;
-      } else {
-        fiveYEl.textContent = "5Y Breakeven: Data unavailable";
-      }
-    }
+    const C = data.current || {};
+    const P = data.monthAgo || {};
 
-    // ------------------------------
-    // Canada Yields
-    // ------------------------------
-    const canadaYields = data.canadaYields || {};
-    canada2Y = canadaYields.canada2Y ?? null;
-    canada10Y = canadaYields.canada10Y ?? null;
-    const canada10YReal = canadaYields.canada10YReal ?? null;
-    const canadaDate = canadaYields.date || "";
-
-    if (el2Y) {
-      el2Y.textContent = canada2Y != null
-        ? `Canada 2Y: ${canada2Y.toFixed(2)}% (as of ${canadaDate})`
-        : "Canada 2Y: Data unavailable";
-    }
-
-    if (el10Y) {
-      el10Y.textContent = canada10Y != null
-        ? `Canada 10Y: ${canada10Y.toFixed(2)}% (as of ${canadaDate})`
-        : "Canada 10Y: Data unavailable";
-    }
-
-    if (el10YReal) {
-      el10YReal.textContent = canada10YReal != null
-        ? `Canada 10Y Real: ${canada10YReal.toFixed(2)}% (as of ${canadaDate})`
-        : "Canada 10Y Real: Data unavailable";
-    }
-
-    // ------------------------------
-    // Spread calculation (10Y - 2Y)
-    // ------------------------------
-    if (spreadEl) {
-      if (canada2Y != null && canada10Y != null) {
-        const spread = (canada10Y - canada2Y).toFixed(2);
-        spreadEl.textContent = `10Y − 2Y Spread: ${spread}%`;
-      } else if (canada2Y != null || canada10Y != null) {
-        spreadEl.textContent = "10Y − 2Y Spread: Partial data available";
-      } else {
-        spreadEl.textContent = "10Y − 2Y Spread: Data unavailable";
-      }
-    }
-
-    // ------------------------------
-    // Canada CPI YoY
-    // ------------------------------
-    if (cpiEl) {
-      const v = data.cpiTrimYoY && data.cpiTrimYoY.value != null ? data.cpiTrimYoY.value : null;
-      const d = data.cpiTrimYoY ? data.cpiTrimYoY.date : null;
-
-      cpiEl.textContent = (v != null && d)
-        ? `CPI-Trim YoY: ${v.toFixed(2)}% (as of ${d})`
-        : "CPI-Trim YoY: Data unavailable";
-    }
-
-    // ------------------------------
-    // StatsCan Unemployment
-    // ------------------------------
-
-    const unempEl = document.getElementById("caUnemployment");
-    if (unempEl) {
-      const raw = data.caUnemployment ? data.caUnemployment.value : null;
-      const v = raw == null ? null : Number(raw);
-      const d = data.caUnemployment ? data.caUnemployment.date : null;
-
-      unempEl.textContent =
-        Number.isFinite(v) && d
-          ? `Canada Unemployment: ${v.toFixed(1)}% (as of ${d})`
-          : "Canada Unemployment: Data unavailable";
-    }
-
-    // ------------------------------
-    // Ivey PMI
-    // ------------------------------
-    const iveyEl = document.getElementById("iveyPmiSA");
-    if (iveyEl) {
-      const obj = data.iveyPmiSA || null;
-
-      if (obj && obj.error) {
-        iveyEl.textContent = `Ivey PMI (SA): ${obj.error}`;
-      } else {
-        const raw = obj ? obj.value : null;
-        const v = raw == null ? null : Number(raw);
-        const d = obj ? obj.date : null;
-
-        iveyEl.textContent =
-          Number.isFinite(v) && d
-            ? `Ivey PMI (SA): ${v.toFixed(1)} (as of ${d})`
-            : "Ivey PMI (SA): Data unavailable";
-      }
-    }
-
-
-    // ------------------------------
-    // IG Spread
-    // ------------------------------
-    const igEl = document.getElementById("igCreditSpread");
-    if (igEl) {
-      const obj = data.igCreditSpread || null;
-      const raw = obj ? obj.value : null;
-      const v = raw == null ? null : Number(raw);
-      const d = obj ? obj.date : null;
-
-      igEl.textContent =
-        Number.isFinite(v) && d
-          ? `IG Credit Spread (OAS): ${v.toFixed(2)}% (as of ${d})`
-          : "IG Credit Spread (OAS): Data unavailable";
-    }
-
-
-
+    tableBody.append(
+      row("US 5Y Breakeven", C.fiveYBreakeven, P.fiveYBreakeven),
+      row("Canada 2Y", C.canadaYields, P.canadaYields, "%", 2),
+      row("Canada 10Y", {
+        value: C.canadaYields?.canada10Y
+      }, {
+        value: P.canadaYields?.canada10Y
+      }),
+      row("Canada 10Y Real", {
+        value: C.canadaYields?.canada10YReal
+      }, {
+        value: P.canadaYields?.canada10YReal
+      }),
+      spreadRow(
+        "Canada 10Y − 2Y Spread",
+        { value: C.canadaYields?.canada10Y },
+        { value: C.canadaYields?.canada2Y },
+        { value: P.canadaYields?.canada10Y },
+        { value: P.canadaYields?.canada2Y }
+      ),
+      row("CPI-Trim YoY", C.cpiTrimYoY, P.cpiTrimYoY),
+      row("Canada Unemployment", C.caUnemployment, P.caUnemployment, "%", 1),
+      row("Ivey PMI (SA)", C.iveyPmiSA, P.iveyPmiSA, "", 1),
+      row("IG Credit Spread (OAS)", C.igCreditSpread, P.igCreditSpread)
+    );
 
   } catch (err) {
     console.error("Frontend error:", err);
-
-    // Fallback: show "Data unavailable" for all
-    [fiveYEl, el2Y, el10Y, el10YReal, spreadEl, cpiEl].forEach(el => {
-      if (el) el.textContent = "Data unavailable";
-    });
+    tableBody.innerHTML =
+      "<tr><td colspan='3'>Data unavailable</td></tr>";
   }
 });
-
-
