@@ -1,4 +1,20 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  
+  // ---------- loading banner (Render cold start) ----------
+  const loadingBanner = document.getElementById("loadingBanner");
+  const loadingDots = document.getElementById("loadingDots");
+
+  let dotsTimer = null;
+  let showTimer = setTimeout(() => {
+    if (loadingBanner) loadingBanner.style.display = "block";
+    if (loadingDots) {
+      dotsTimer = setInterval(() => {
+        loadingDots.textContent =
+          loadingDots.textContent.length >= 3 ? "." : loadingDots.textContent + ".";
+      }, 600);
+    }
+  }, 1500); // only show if it's actually slow
+
   const tableBody = document.getElementById("dataBody");
 
   // ---------- helpers ----------
@@ -169,6 +185,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const res = await fetch("https://bondsignal.onrender.com/api/yields", { cache: "no-store" });
     if (!res.ok) throw new Error(`API returned ${res.status}`);
     const data = await res.json();
+    if (showTimer) clearTimeout(showTimer);
+    if (dotsTimer) clearInterval(dotsTimer);
+    if (loadingBanner) loadingBanner.style.display = "none";
+
 
     // Get the month
     const monthKeyEl = document.getElementById("monthKey");
@@ -185,18 +205,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderSignalGuidance(signalScore);
 
     function renderSignalGuidance(baseSignal) {
-      const topEl = document.getElementById("signalGuidanceText");
       const bottomEl = document.getElementById("signalGuidanceTextBottom");
       const adjInput = document.getElementById("rateCutAdj");
       const adjustedLine = document.getElementById("adjustedSignalLine");
 
-      if (!topEl && !bottomEl) return;
+      if (!bottomEl) return;
 
-      function clamp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
-
-      function setGuidanceText(txt) {
-        if (topEl) topEl.textContent = txt;
-        if (bottomEl) bottomEl.textContent = txt;
+      function clamp(n, lo, hi) {
+        return Math.max(lo, Math.min(hi, n));
       }
 
       function render() {
@@ -204,7 +220,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (adjInput) {
           const raw = Number(adjInput.value);
           adj = Number.isFinite(raw) ? clamp(raw, -5, 5) : 0;
-          // normalize input display
           if (String(adj) !== adjInput.value) adjInput.value = String(adj);
         }
 
@@ -216,22 +231,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         if (adjusted === 0) {
-          setGuidanceText(`Signal = 0 → Hold (no duration tilt).`);
+          bottomEl.textContent = "Hold (no duration tilt).";
         } else if (adjusted > 0) {
-          const strength = adjusted > 5 ? "Strong favour" : "Favour";
-          setGuidanceText(`Signal = ${adjusted} → ${strength} long-term bonds.`);
+          const strength = adjusted > 5 ? "Strongly favour" : "Favour";
+          bottomEl.textContent = `${strength} long-term bonds.`;
         } else {
-          const strength = adjusted < -5 ? "Strong favour" : "Favour";
-          setGuidanceText(`Signal = ${adjusted} → ${strength} short-term bonds.`);
+          const strength = adjusted < -5 ? "Strongly favour" : "Favour";
+          bottomEl.textContent = `${strength} short-term bonds.`;
         }
       }
 
-      // Initial render
+      // initial render
       render();
 
-      // Re-render on input change
+      // update on input change
       if (adjInput) adjInput.addEventListener("input", render);
     }
+
 
 
 
@@ -265,6 +281,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
   } catch (err) {
     console.error("Frontend error:", err);
+    if (showTimer) clearTimeout(showTimer);
+    if (dotsTimer) clearInterval(dotsTimer);
+    if (loadingBanner) {
+      loadingBanner.style.display = "block";
+      loadingBanner.textContent = "⚠️ Server is still waking up or unavailable. Please wait and refresh in a moment.";
+    }
     setErrorRow("Data unavailable");
   }
 });
