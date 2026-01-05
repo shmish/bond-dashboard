@@ -59,17 +59,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const P = data.monthAgo || {};
 
     tableBody.append(
-      row("US 5Y Breakeven", C.fiveYBreakeven, P.fiveYBreakeven),
+      
       row("Canada 2Y", C.canadaYields, P.canadaYields, "%", 2),
       row("Canada 10Y", {
         value: C.canadaYields?.canada10Y
       }, {
         value: P.canadaYields?.canada10Y
-      }),
-      row("Canada 10Y Real", {
-        value: C.canadaYields?.canada10YReal
-      }, {
-        value: P.canadaYields?.canada10YReal
       }),
       spreadRow(
         "Canada 10Y − 2Y Spread",
@@ -78,6 +73,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         { value: P.canadaYields?.canada10Y },
         { value: P.canadaYields?.canada2Y }
       ),
+      row("Canada 10Y Real", {
+        value: C.canadaYields?.canada10YReal
+      }, {
+        value: P.canadaYields?.canada10YReal
+      }),
+      row("US 5Y Breakeven", C.fiveYBreakeven, P.fiveYBreakeven),
       row("CPI-Trim YoY", C.cpiTrimYoY, P.cpiTrimYoY),
       row("Canada Unemployment", C.caUnemployment, P.caUnemployment, "%", 1),
       row("Ivey PMI (SA)", C.iveyPmiSA, P.iveyPmiSA, "", 1),
