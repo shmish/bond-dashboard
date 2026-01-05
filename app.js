@@ -183,6 +183,30 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const signalScore = computeSignalScoreAll(C, P);
 
+    renderSignalGuidance(signalScore);
+
+    function renderSignalGuidance(signal) {
+      const el = document.getElementById("signalGuidanceText");
+      if (!el) return;
+
+      if (signal === 0) {
+        el.textContent = `Signal = 0 → Hold (no duration tilt).`;
+        return;
+      }
+
+      if (signal > 0) {
+        const strength = signal > 5 ? "Strong favour" : "Favour";
+        el.textContent = `Signal = ${signal} → ${strength} long-term bonds.`;
+        return;
+      }
+
+      // signal < 0
+      const strength = signal < -5 ? "Strong favour" : "Favour";
+      el.textContent = `Signal = ${signal} → ${strength} short-term bonds.`;
+    }
+
+    renderSignalGuidance(signalScore);
+
     tableBody.innerHTML = "";
 
     tableBody.append(
