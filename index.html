@@ -109,36 +109,57 @@
     </table>
   </div>
 
-  <div id="signalGuidance" style="margin-top:16px; padding:12px; border:1px solid #ccc; border-radius:8px;">
+  <div id="signalGuidance" style="margin-top:16px; padding:12px; border:1px solid #ccc; border-radius:8px; max-width: 640px; background:#fff;">
     <div style="font-weight:600; margin-bottom:6px;">Bond duration guidance</div>
-    <div id="signalGuidanceText">Loading…</div>
-    <div>If the expected number of rate cuts for the next 12 months is </div>
-    <table>
+
+    <div id="signalGuidanceText" style="margin-bottom:10px;">Loading…</div>
+
+    <div style="margin: 10px 0 8px; color:#333;">
+      Optional: add a rate-cut adjustment to the signal (if you believe expected cuts should increase it).
+    </div>
+
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+      <label for="rateCutAdj" style="min-width: 230px;">Rate-cut signal adjustment:</label>
+      <input id="rateCutAdj"
+            type="number"
+            step="1"
+            min="-5"
+            max="5"
+            value="0"
+            style="width:80px; padding:4px 6px;" />
+      <span class="muted">(−5 to +5)</span>
+    </div>
+
+    <table style="border-collapse:collapse; display:inline-table; width:auto; max-width:100%; font-size:13px;">
       <thead>
         <tr>
-          <th>Expectations</th>
-          <th>Signal Adjustment</th>
+          <th style="text-align:left; padding:6px 10px; border-bottom:1px solid #e5e7eb; background:#f3f4f6;">Expectations</th>
+          <th style="text-align:left; padding:6px 10px; border-bottom:1px solid #e5e7eb; background:#f3f4f6;">Signal Adjustment</th>
         </tr>
       </thead>
+      <tbody>
         <tr>
-          <td>Market expects no rate cuts</td>
-          <td>0</td>
+          <td style="padding:6px 10px; border-bottom:1px solid #f0f0f0;">Market expects no rate cuts</td>
+          <td style="padding:6px 10px; border-bottom:1px solid #f0f0f0;">0</td>
         </tr>
         <tr>
-          <td>Market expects one 25-bp cut</td>
-          <td>+1</td>
+          <td style="padding:6px 10px; border-bottom:1px solid #f0f0f0;">Market expects one 25-bp cut</td>
+          <td style="padding:6px 10px; border-bottom:1px solid #f0f0f0;">+1</td>
         </tr>
         <tr>
-          <td>Market expects two cuts</td>
-          <td>+2</td>
+          <td style="padding:6px 10px; border-bottom:1px solid #f0f0f0;">Market expects two cuts</td>
+          <td style="padding:6px 10px; border-bottom:1px solid #f0f0f0;">+2</td>
         </tr>
         <tr>
-          <td>Market expects a full easing cycle</td>
-          <td>+3</td>
+          <td style="padding:6px 10px;">Market expects a full easing cycle</td>
+          <td style="padding:6px 10px;">+3</td>
         </tr>
       </tbody>
     </table>
+
+    <div id="adjustedSignalLine" style="margin-top:10px; font-weight:600;"></div>
   </div>
+
   <div class="footnote">
     “1 Month Ago” uses the most recent observation on or before ~30 days ago (varies by series frequency).
   </div>
