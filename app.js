@@ -96,21 +96,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // ------------------------------
-    // FRED PMI
+    // Ivey PMI
     // ------------------------------
-    const pmiEl = document.getElementById("canadaPmi");
-    if (pmiEl) {
-      const obj = data.canadaPmi || null;
-      const raw = obj ? obj.value : null;
-      const v = raw == null ? null : Number(raw);
-      const d = obj ? obj.date : null;
-      const id = obj ? obj.seriesId : null;
+    const iveyEl = document.getElementById("iveyPmiSA");
+    if (iveyEl) {
+      const obj = data.iveyPmiSA || null;
 
-      pmiEl.textContent =
-        Number.isFinite(v) && d
-          ? `Canada PMI: ${v.toFixed(1)} (as of ${d})${id ? ` [${id}]` : ""}`
-          : "Canada PMI: Data unavailable";
+      if (obj && obj.error) {
+        iveyEl.textContent = `Ivey PMI (SA): ${obj.error}`;
+      } else {
+        const raw = obj ? obj.value : null;
+        const v = raw == null ? null : Number(raw);
+        const d = obj ? obj.date : null;
+
+        iveyEl.textContent =
+          Number.isFinite(v) && d
+            ? `Ivey PMI (SA): ${v.toFixed(1)} (as of ${d})`
+            : "Ivey PMI (SA): Data unavailable";
+      }
     }
+
 
 
   } catch (err) {
