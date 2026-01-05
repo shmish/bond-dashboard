@@ -1,51 +1,117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
   <title>Canada Bond Dashboard</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 2rem auto;
-      padding: 1rem;
-      background: #f5f5f5;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 24px;
+      color: #111;
+      background: #fafafa;
     }
-    h1 {
-      text-align: center;
+
+    h1 { margin: 0 0 12px; font-size: 22px; }
+
+    .table-wrap {
+      max-width: 980px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
     }
-    .yield-box {
-      background: white;
-      padding: 1rem;
-      margin: 0.5rem 0;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
     }
-    .label {
-      font-weight: bold;
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #f3f4f6;
+      color: #111;
+      text-align: left;
+      font-weight: 600;
+      padding: 10px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fcfcfd;
+    }
+
+    td.num, th.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .muted {
+      color: #6b7280;
+    }
+
+    .delta-pos { color: #0a7a34; }
+    .delta-neg { color: #b42318; }
+
+    .score-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #111;
+      color: #fff;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.2px;
+    }
+
+    .row-strong td {
+      font-weight: 700;
+      background: #f9fafb;
+    }
+
+    .footnote {
+      max-width: 980px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #6b7280;
     }
   </style>
 </head>
 <body>
   <h1>Canada Bond Dashboard</h1>
 
-  <table border="1" cellpadding="6">
-    <thead>
-      <tr>
-        <th>Indicator</th>
-        <th>Current</th>
-        <th>1 Month Ago</th>
-        <th>Δ</th>
-      </tr>
-    </thead>
-    <tbody id="dataBody">
-      <tr><td colspan="5">Loading…</td></tr>
-    </tbody>
-  </table>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Indicator</th>
+          <th class="num">Current</th>
+          <th class="num">1 Month Ago</th>
+          <th class="num">Δ</th>
+          <th class="num">Signal</th>
+        </tr>
+      </thead>
+      <tbody id="dataBody">
+        <tr><td colspan="5" class="muted">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
 
-  <script src="app.js?v=13"></script>
+  <div class="footnote">
+    “1 Month Ago” uses the most recent observation on or before ~30 days ago (varies by series frequency).
+  </div>
 
-
+  <script src="app.js?v=15"></script>
 </body>
 </html>
 
