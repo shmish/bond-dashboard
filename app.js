@@ -96,12 +96,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     const CY = C.canadaYields || {};
     const PY = P.canadaYields || {};
 
+    console.log("Canada yields (current):", CY);
+    console.log("Canada yields (monthAgo):", PY);
+
     tableBody.innerHTML = "";
 
     tableBody.append(
       makeRow("US 5Y Breakeven", C.fiveYBreakeven, P.fiveYBreakeven, "%", 2),
 
       makeRow("Canada 2Y", { value: CY.canada2Y }, { value: PY.canada2Y }, "%", 2),
+      makeRow(
+        "Canada 2Y",
+        { value: CY.canada2Y },
+        { value: PY.canada2Y },
+        "%", 2
+      ),
+
       makeRow("Canada 10Y", { value: CY.canada10Y }, { value: PY.canada10Y }, "%", 2),
       makeRow("Canada 10Y Real", { value: CY.canada10YReal }, { value: PY.canada10YReal }, "%", 2),
 
