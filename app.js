@@ -117,6 +117,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
+    // ------------------------------
+    // IG Spread
+    // ------------------------------
+    const igEl = document.getElementById("igCreditSpread");
+    if (igEl) {
+      const obj = data.igCreditSpread || null;
+      const raw = obj ? obj.value : null;
+      const v = raw == null ? null : Number(raw);
+      const d = obj ? obj.date : null;
+
+      igEl.textContent =
+        Number.isFinite(v) && d
+          ? `IG Credit Spread (OAS): ${v.toFixed(2)}% (as of ${d})`
+          : "IG Credit Spread (OAS): Data unavailable";
+    }
+
+
+
 
   } catch (err) {
     console.error("Frontend error:", err);
