@@ -170,6 +170,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!res.ok) throw new Error(`API returned ${res.status}`);
     const data = await res.json();
 
+    // Get the month
+    const monthKeyEl = document.getElementById("monthKey");
+    if (monthKeyEl && data.meta?.monthKey) {
+      monthKeyEl.textContent = `(as of ${data.meta.monthKey})`;
+    }
+
     const C = data.current || {};
     const P = data.monthAgo || {};
     const CY = C.canadaYields || {};
