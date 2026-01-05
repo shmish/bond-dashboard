@@ -79,6 +79,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         : "CPI-Trim YoY: Data unavailable";
     }
 
+    // ------------------------------
+    // StatsCan Unemployment
+    // ------------------------------
+
+    const unempEl = document.getElementById("caUnemployment");
+    if (unempEl) {
+      const raw = data.caUnemployment ? data.caUnemployment.value : null;
+      const v = raw == null ? null : Number(raw);
+      const d = data.caUnemployment ? data.caUnemployment.date : null;
+
+      unempEl.textContent =
+        Number.isFinite(v) && d
+          ? `Canada Unemployment: ${v.toFixed(1)}% (as of ${d})`
+          : "Canada Unemployment: Data unavailable";
+    }
+
+
   } catch (err) {
     console.error("Frontend error:", err);
 
