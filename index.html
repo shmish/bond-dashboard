@@ -112,6 +112,32 @@
   <div id="signalGuidance" style="margin-top:16px; padding:12px; border:1px solid #ccc; border-radius:8px;">
     <div style="font-weight:600; margin-bottom:6px;">Bond duration guidance</div>
     <div id="signalGuidanceText">Loading…</div>
+    <div>If the expected number of rate cuts for the next 12 months is </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Expectations</th>
+          <th>Signal Adjustment</th>
+        </tr>
+      </thead>
+        <tr>
+          <td>Market expects no rate cuts</td>
+          <td>0</td>
+        </tr>
+        <tr>
+          <td>Market expects one 25-bp cut</td>
+          <td>+1</td>
+        </tr>
+        <tr>
+          <td>Market expects two cuts</td>
+          <td>+2</td>
+        </tr>
+        <tr>
+          <td>Market expects a full easing cycle</td>
+          <td>+3</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   <div class="footnote">
     “1 Month Ago” uses the most recent observation on or before ~30 days ago (varies by series frequency).
