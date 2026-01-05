@@ -189,13 +189,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       const bottomEl = document.getElementById("signalGuidanceTextBottom");
       const adjInput = document.getElementById("rateCutAdj");
       const adjustedLine = document.getElementById("adjustedSignalLine");
+
       if (!topEl && !bottomEl) return;
 
-      function clamp(n, lo, hi) {
-        return Math.max(lo, Math.min(hi, n));
+      function clamp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
+
+      function setGuidanceText(txt) {
+        if (topEl) topEl.textContent = txt;
+        if (bottomEl) bottomEl.textContent = txt;
       }
 
-      function computeAdjusted() {
+      function render() {
         let adj = 0;
         if (adjInput) {
           const raw = Number(adjInput.value);
@@ -203,46 +207,32 @@ document.addEventListener("DOMContentLoaded", async () => {
           // normalize input display
           if (String(adj) !== adjInput.value) adjInput.value = String(adj);
         }
-        const adjusted = baseSignal + adj;
-        return { adj, adjusted };
-      }
 
-      function render() {
-        const { adj, adjusted } = computeAdjusted();
+        const adjusted = baseSignal + adj;
 
         if (adjustedLine) {
-          adjustedLine.textContent = `Adjusted Signal = ${adjusted} (base ${baseSignal}${adj >= 0 ? " + " : " − "}${Math.abs(adj)})`;
+          adjustedLine.textContent =
+            `Adjusted Signal = ${adjusted} (base ${baseSignal}${adj >= 0 ? " + " : " − "}${Math.abs(adj)})`;
         }
 
         if (adjusted === 0) {
           setGuidanceText(`Signal = 0 → Hold (no duration tilt).`);
-          return;
-        }
-
-        if (adjusted > 0) {
+        } else if (adjusted > 0) {
           const strength = adjusted > 5 ? "Strong favour" : "Favour";
           setGuidanceText(`Signal = ${adjusted} → ${strength} long-term bonds.`);
-          return;
+        } else {
+          const strength = adjusted < -5 ? "Strong favour" : "Favour";
+          setGuidanceText(`Signal = ${adjusted} → ${strength} short-term bonds.`);
         }
-
-        // adjusted < 0
-        const strength = adjusted < -5 ? "Strong favour" : "Favour";
-        setGuidanceText(`Signal = ${adjusted} → ${strength} short-term bonds.`);
       }
 
-      function setGuidanceText(txt) {
-        if (topEl) topEl.textContent = txt;
-        if (bottomEl) bottomEl.textContent = txt;
-      }
-
-      // initial render
+      // Initial render
       render();
 
-      // re-render when user changes adjustment
-      if (adjInput) {
-        adjInput.addEventListener("input", render);
-      }
+      // Re-render on input change
+      if (adjInput) adjInput.addEventListener("input", render);
     }
+
 
 
     tableBody.innerHTML = "";
