@@ -1,93 +1,129 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const tableBody = document.getElementById("dataBody");
 
+  // ---------- helpers ----------
+  function num(x) {
+    const v = (x == null) ? null : Number(x);
+    return Number.isFinite(v) ? v : null;
+  }
+
   function fmt(v, digits = 2) {
-    return (v == null || !Number.isFinite(v)) ? "—" : v.toFixed(digits);
+    return v == null ? "—" : v.toFixed(digits);
   }
 
-  function row(label, cur, prev, unit = "%", digits = 2) {
+  function fmtSigned(v, digits = 2) {
+    if (v == null) return "—";
+    const s = v >= 0 ? "+" : "";
+    return s + v.toFixed(digits);
+  }
+
+  function makeRow(label, curObj, prevObj, unit = "%", digits = 2) {
     const tr = document.createElement("tr");
+
+    const cur = num(curObj?.value);
+    const prev = num(prevObj?.value);
+    const d = (cur != null && prev != null) ? (cur - prev) : null;
 
     const tdLabel = document.createElement("td");
     tdLabel.textContent = label;
 
     const tdCur = document.createElement("td");
-    tdCur.textContent = cur?.value != null
-      ? `${fmt(cur.value, digits)}${unit}`
-      : "—";
+    tdCur.textContent = cur != null ? `${fmt(cur, digits)}${unit}` : "—";
 
     const tdPrev = document.createElement("td");
-    tdPrev.textContent = prev?.value != null
-      ? `${fmt(prev.value, digits)}${unit}`
-      : "—";
+    tdPrev.textContent = prev != null ? `${fmt(prev, digits)}${unit}` : "—";
 
-    tr.append(tdLabel, tdCur, tdPrev);
+    const tdDelta = document.createElement("td");
+    tdDelta.textContent = d != null ? `${fmtSigned(d, digits)}${unit}` : "—";
+
+    tr.append(tdLabel, tdCur, tdPrev, tdDelta);
     return tr;
   }
 
-  function spreadRow(label, curY, curX, prevY, prevX) {
+  // For spreads like 10Y-2Y (computed from two series)
+  function makeSpreadRow(label, curY, curX, prevY, prevX, digits = 2) {
     const tr = document.createElement("tr");
+
+    const curYv = num(curY?.value);
+    const curXv = num(curX?.value);
+    const prevYv = num(prevY?.value);
+    const prevXv = num(prevX?.value);
+
+    const curSpread = (curYv != null && curXv != null) ? (curYv - curXv) : null;
+    const prevSpread = (prevYv != null && prevXv != null) ? (prevYv - prevXv) : null;
+    const d = (curSpread != null && prevSpread != null) ? (curSpread - prevSpread) : null;
 
     const tdLabel = document.createElement("td");
     tdLabel.textContent = label;
 
-    const cur =
-      curY?.value != null && curX?.value != null
-        ? (curY.value - curX.value)
-        : null;
-
-    const prev =
-      prevY?.value != null && prevX?.value != null
-        ? (prevY.value - prevX.value)
-        : null;
-
     const tdCur = document.createElement("td");
-    tdCur.textContent = cur != null ? `${cur.toFixed(2)}%` : "—";
+    tdCur.textContent = curSpread != null ? `${fmt(curSpread, digits)}%` : "—";
 
     const tdPrev = document.createElement("td");
-    tdPrev.textContent = prev != null ? `${prev.toFixed(2)}%` : "—";
+    tdPrev.textContent = prevSpread != null ? `${fmt(prevSpread, digits)}%` : "—";
 
-    tr.append(tdLabel, tdCur, tdPrev);
+    const tdDelta = document.createElement("td");
+    tdDelta.textContent = d != null ? `${fmtSigned(d, digits)}%` : "—";
+
+    tr.append(tdLabel, tdCur, tdPrev, tdDelta);
     return tr;
+  }
+
+  function setErrorRow(msg) {
+    if (!tableBody) return;
+    tableBody.innerHTML = "";
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 4;
+    td.textContent = msg;
+    tr.appendChild(td);
+    tableBody.appendChild(tr);
+  }
+
+  // ---------- main ----------
+  if (!tableBody) {
+    console.error("Missing <tbody id='dataBody'> in index.html");
+    return;
   }
 
   try {
-    const res = await fetch("https://bondsignal.onrender.com/api/yields");
+    const res = await fetch("https://bondsignal.onrender.com/api/yields", { cache: "no-store" });
+    if (!res.ok) throw new Error(`API returned ${res.status}`);
     const data = await res.json();
 
     const C = data.current || {};
     const P = data.monthAgo || {};
+    const CY = C.canadaYields || {};
+    const PY = P.canadaYields || {};
+
+    tableBody.innerHTML = "";
 
     tableBody.append(
-      
-      row("Canada 2Y", C.canadaYields, P.canadaYields, "%", 2),
-      row("Canada 10Y", {
-        value: C.canadaYields?.canada10Y
-      }, {
-        value: P.canadaYields?.canada10Y
-      }),
-      spreadRow(
-        "Canada 10Y − 2Y Spread",
-        { value: C.canadaYields?.canada10Y },
-        { value: C.canadaYields?.canada2Y },
-        { value: P.canadaYields?.canada10Y },
-        { value: P.canadaYields?.canada2Y }
-      ),
-      row("Canada 10Y Real", {
-        value: C.canadaYields?.canada10YReal
-      }, {
-        value: P.canadaYields?.canada10YReal
-      }),
-      row("US 5Y Breakeven", C.fiveYBreakeven, P.fiveYBreakeven),
-      row("CPI-Trim YoY", C.cpiTrimYoY, P.cpiTrimYoY),
-      row("Canada Unemployment", C.caUnemployment, P.caUnemployment, "%", 1),
-      row("Ivey PMI (SA)", C.iveyPmiSA, P.iveyPmiSA, "", 1),
-      row("IG Credit Spread (OAS)", C.igCreditSpread, P.igCreditSpread)
-    );
+      makeRow("US 5Y Breakeven", C.fiveYBreakeven, P.fiveYBreakeven, "%", 2),
 
+      makeRow("Canada 2Y", { value: CY.canada2Y }, { value: PY.canada2Y }, "%", 2),
+      makeRow("Canada 10Y", { value: CY.canada10Y }, { value: PY.canada10Y }, "%", 2),
+      makeRow("Canada 10Y Real", { value: CY.canada10YReal }, { value: PY.canada10YReal }, "%", 2),
+
+      makeSpreadRow(
+        "Canada 10Y − 2Y Spread",
+        { value: CY.canada10Y }, { value: CY.canada2Y },
+        { value: PY.canada10Y }, { value: PY.canada2Y },
+        2
+      ),
+
+      makeRow("CPI-Trim YoY", C.cpiTrimYoY, P.cpiTrimYoY, "%", 2),
+      makeRow("Canada Unemployment", C.caUnemployment, P.caUnemployment, "%", 1),
+
+      // PMI is index points, not percent
+      makeRow("Ivey PMI (SA)", C.iveyPmiSA, P.iveyPmiSA, "", 1),
+
+      makeRow("IG Credit Spread (OAS)", C.igCreditSpread, P.igCreditSpread, "%", 2),
+    );
   } catch (err) {
     console.error("Frontend error:", err);
-    tableBody.innerHTML =
-      "<tr><td colspan='3'>Data unavailable</td></tr>";
+    setErrorRow("Data unavailable");
   }
 });
+
+
