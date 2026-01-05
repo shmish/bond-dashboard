@@ -185,10 +185,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderSignalGuidance(signalScore);
 
     function renderSignalGuidance(baseSignal) {
-      const el = document.getElementById("signalGuidanceText");
+      const topEl = document.getElementById("signalGuidanceText");
+      const bottomEl = document.getElementById("signalGuidanceTextBottom");
       const adjInput = document.getElementById("rateCutAdj");
       const adjustedLine = document.getElementById("adjustedSignalLine");
-      if (!el) return;
+      if (!topEl && !bottomEl) return;
 
       function clamp(n, lo, hi) {
         return Math.max(lo, Math.min(hi, n));
@@ -214,19 +215,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         if (adjusted === 0) {
-          el.textContent = `Signal = 0 → Hold (no duration tilt).`;
+          setGuidanceText(`Signal = 0 → Hold (no duration tilt).`);
           return;
         }
 
         if (adjusted > 0) {
           const strength = adjusted > 5 ? "Strong favour" : "Favour";
-          el.textContent = `Signal = ${adjusted} → ${strength} long-term bonds.`;
+          setGuidanceText(`Signal = ${adjusted} → ${strength} long-term bonds.`);
           return;
         }
 
         // adjusted < 0
         const strength = adjusted < -5 ? "Strong favour" : "Favour";
-        el.textContent = `Signal = ${adjusted} → ${strength} short-term bonds.`;
+        setGuidanceText(`Signal = ${adjusted} → ${strength} short-term bonds.`);
+      }
+
+      function setGuidanceText(txt) {
+        if (topEl) topEl.textContent = txt;
+        if (bottomEl) bottomEl.textContent = txt;
       }
 
       // initial render
